@@ -5,23 +5,20 @@ import {
   loginUser,
   updateUser,
   deleteUser
-} from '../controllers/userController.js';
+} from "../controllers/userController.js";
+
+// ✅ 1. Import the protect middleware
+import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-//Passenger Login (Phone-only)
-router.post("/verify-phone", verifyPhone);
+// ✅ Public Routes
+router.post("/verify-phone", verifyPhone); // Passenger login
+router.post("/register", registerUser);    // Driver/Admin register
+router.post("/login", loginUser);          // Driver/Admin login
 
-// Driver/Admin Register
-router.post("/register", registerUser);
-
-//  Driver/Admin Login
-router.post("/login", loginUser);
-
-//  Update User Profile
-router.put("/update/:id", updateUser);
-
-// Delete User
-router.delete("/delete/:id", deleteUser);
+// ✅ Protected Routes
+router.put("/update/:id", protect, updateUser);
+router.delete("/delete/:id", protect, deleteUser);
 
 export default router;
