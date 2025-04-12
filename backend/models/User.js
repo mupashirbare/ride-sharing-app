@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  profileImage: {
+    type: String, // URL or local path
+    default: null
+  },
   password: {
     type: String,
   },
@@ -59,6 +63,17 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+// ✅ Automatically hash password if modified
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password") || !this.password) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// ✅ Add a method to compare password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;
