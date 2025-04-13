@@ -1,85 +1,100 @@
+import Ride from "../models/Ride.js";
 import RideRequest from "../models/RideRequest.js";
 import User from "../models/User.js";
 
-// Create a new ride request (Passenger only)
-export const createRideRequest = async (req, res) => {
+//  1. Create or Join a Ride (shared logic)
+export const createOrJoinRide = async (req, res) => {
   try {
-    const { passengerId, pickupLocation, dropOffLocation, price } = req.body;
+    const requestId = req.params.requestId;
+    const request = await RideRequest.findById(requestId);
 
-    // Validate passenger user
-    const user = await User.findById(passengerId);
-    if (!user || user.userType !== "passenger") {
-      return res.status(403).json({ message: "Only passengers can request rides" });
+    if (!request || request.status !== "pending") {
+      return res.status(404).json({ message: "Invalid or already processed request" });
     }
 
-    const ride = new RideRequest({
-      passengerId,
-      pickupLocation,
-      dropOffLocation,
-      price
+    // Optional: match by route & time
+    let ride = await Ride.findOne({
+      pickupLocation: request.pickupLocation,
+      dropOffLocation: request.dropOffLocation,
+      rideStatus: "in_progress"
+    });
+
+    // If no active ride found, create a new one
+    if (!ride) {
+      const driver = await User.findOne({ userType: "driver", isApproved: true });
+      if (!driver) return res.status(400).json({ message: "No available driver found" });
+
+      ride = new Ride({
+        driver: driver._id,
+        pickupLocation: request.pickupLocation,
+        dropOffLocation: request.dropOffLocation,
+        rideStatus: "in_progress",
+        passengers: []
+      });
+    }
+
+    // Add the passenger to the ride
+    ride.passengers.push({
+      passenger: request.passengerId,
+      status: "waiting",
+      fare: request.price
     });
 
     await ride.save();
 
-    res.status(201).json({
-      message: "Ride request created successfully",
+    // Update the ride request status
+    request.status = "accepted";
+    request.acceptedAt = new Date();
+    await request.save();
+
+    res.status(200).json({
+      message: "Ride assigned",
       ride
     });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-// Edit ride request (pickup/drop only)
-export const editRideRequest = async (req, res) => {
+// 2. Get ride by ID
+export const getRideById = async (req, res) => {
   try {
-    const { rideId } = req.params;
-    const { passengerId, pickupLocation, dropOffLocation } = req.body;
+    const ride = await Ride.findById(req.params.id)
+      .populate("driver", "name phone")
+      .populate("passengers.passenger", "name phone");
 
-    const ride = await RideRequest.findById(rideId);
-    if (!ride) return res.status(404).json({ message: "Ride request not found" });
-
-    if (ride.passengerId.toString() !== passengerId) {
-      return res.status(403).json({ message: "You can only edit your own ride request" });
+    if (!ride) {
+      return res.status(404).json({ message: "Ride not found" });
     }
 
-    if (ride.status !== "pending") {
-      return res.status(400).json({ message: "Only pending ride requests can be edited" });
-    }
-
-    // Update only allowed fields
-    ride.pickupLocation = pickupLocation;
-    ride.dropOffLocation = dropOffLocation;
-
-    await ride.save();
-    res.status(200).json({ message: "Ride request updated successfully", ride });
+    res.status(200).json(ride);
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-// Cancel ride request
-export const cancelRideRequest = async (req, res) => {
+//  3. Get all rides for a driver
+export const getDriverRides = async (req, res) => {
   try {
-    const { rideId } = req.params;
-    const { passengerId } = req.body;
+    const rides = await Ride.find({ driver: req.params.driverId })
+      .populate("passengers.passenger", "name phone")
+      .sort({ createdAt: -1 });
 
-    const ride = await RideRequest.findById(rideId);
-    if (!ride) return res.status(404).json({ message: "Ride request not found" });
-
-    if (ride.passengerId.toString() !== passengerId) {
-      return res.status(403).json({ message: "You can only cancel your own ride request" });
-    }
-
-    if (ride.status !== "pending") {
-      return res.status(400).json({ message: "Only pending ride requests can be cancelled" });
-    }
-
-    ride.status = "cancelled";
-    await ride.save();
-
-    res.status(200).json({ message: "Ride request cancelled successfully", ride });
+    res.status(200).json(rides);
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// 4. Get all rides for a passenger
+export const getPassengerRides = async (req, res) => {
+  try {
+    const rides = await Ride.find({ "passengers.passenger": req.params.passengerId })
+      .populate("driver", "name phone")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(rides);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
