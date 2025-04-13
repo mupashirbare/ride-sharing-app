@@ -1,10 +1,23 @@
 import express from "express";
-import { createRideRequest,editRideRequest,cancelRideRequest } from "../controllers/rideController.js";
+import {
+  createOrJoinRide,
+  getRideById,
+  getDriverRides,
+  getPassengerRides
+} from "../controllers/rideController.js";
 
-const routers = express.Router();
+const router = express.Router();
 
-routers.post("/request", createRideRequest); // Only passengers
-routers.put("/request/:rideId", editRideRequest); // Edit ride (pickup/drop only)
-routers.delete("/request/:rideId", cancelRideRequest); // Cancel ride
+// Assign a passenger to a ride (new or existing)
+router.post("/assign/:requestId",createOrJoinRide);
 
-export default routers;
+// Get details of a specific ride
+router.get("/:id",  getRideById);
+
+//  Get all rides by driver
+router.get("/driver/:driverId", getDriverRides);
+
+//  Get all rides joined by a passenger
+router.get("/passenger/:passengerId",getPassengerRides);
+
+export default router;
