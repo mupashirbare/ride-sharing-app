@@ -1,69 +1,42 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
-  // Basic Info for All Users
   name: {
     type: String,
-    trim: true
+    trim: true,
+    // required: true
   },
   email: {
     type: String,
+    lowercase: true,
     unique: true,
-    lowercase: true
+    // required: true
   },
   phone: {
     type: String,
-    required: true,
-    unique: true
-  },
-  profileImage: {
-    type: String, // URL or local path
-    default: null
+    unique: true,
+    required: true
   },
   password: {
     type: String,
+    // required: true
   },
-
-  // Role: passenger, driver, admin
   userType: {
     type: String,
     enum: ["passenger", "driver", "admin"],
     required: true
   },
-
-  // Driver-Specific Info (optional for others)
-  isApproved: {
-    type: Boolean,
-    default: false
+  profileImage: {
+    type: String, // URL to the profile picture
+    default: "https://example.com/default-profile.png"
   },
-  licenseNumber: {
-    type: String,
-    default: null
-  },
-  vehicleType: {
-    type: String,
-    default: null
-  },
-  vehicleModel: {
-    type: String,
-    default: null
-  },
-  plateNumber: {
-    type: String,
-    default: null
-  },
-  licenseImage: {
-    type: String, // URL or file path
-    default: null
-  },
-
-  // Admin-only and general fields
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
-// ✅ Automatically hash password if modified
+// Automatically hash password if modified
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password") || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 10);
