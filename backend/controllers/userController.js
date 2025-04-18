@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
@@ -66,14 +65,12 @@ export const registerUser = async (req, res) => {
     });
     if (existing) return res.status(400).json({ message: "User already exists" });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const userData = {
       name,
       username,
       email,
       phone,
-      password: hashedPassword,
+      password,
       userType
     };
 
@@ -101,7 +98,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// ✅ 3. Login Driver or Admin
 export const loginUser = async (req, res) => {
   try {
     const { usernameOrEmail, password } = req.body;
@@ -116,7 +112,8 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Passengers use phone login only" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // ✅ Correct method call
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     if (user.userType === "driver" && !user.isApproved) {
@@ -135,6 +132,7 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
 // ✅ Update user profile (name, email, etc.)
 export const updateUser = async (req, res) => {
   try {
