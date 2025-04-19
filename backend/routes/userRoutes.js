@@ -1,25 +1,24 @@
+// routes/userRoutes.js
 import express from "express";
 import {
-  verifyPhone,
-  loginUser,
   updateUser,
   deleteUser,
-  googleLogin
+  getAllUsers,
+  getMe,
+  getUserById
 } from "../controllers/userController.js";
+import protect from "../middleware/authMiddleware.js";
+import isAdmin from "../middleware/adminMiddleware.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-// Passenger login via phone number
-router.post("/verify-phone", verifyPhone);
+router.get("/me", protect, getMe); // GET /api/users/me
+router.put("/update-profile", protect, upload.single("profileImage"), updateUser); // PUT /api/users/update-profile
 
-// Driver/Admin login
-router.post("/login", loginUser);
-
-// Update general user info (name, email, etc.)
-router.put("/update/:id", updateUser);
-router.post("/google-login", googleLogin);
-
-// Delete user by ID
-router.delete("/delete/:id", deleteUser);
+// Admin-only routes
+router.get("/", protect, isAdmin, getAllUsers);     // GET /api/users
+router.get("/:id", protect, isAdmin, getUserById);  // GET /api/users/:id
+router.delete("/:id", protect, isAdmin, deleteUser);// DELETE /api/users/:id
 
 export default router;

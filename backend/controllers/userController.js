@@ -98,13 +98,19 @@ export const googleLogin = async (req, res) => {
     res.status(500).json({ message: "Google login failed", error: err.message });
   }
 };
-
-// ✅ Update user profile (including profileImage)
+//update user
 export const updateUser = async (req, res) => {
   try {
-    const userId = req.params.id;
+    console.log("🔐 req.user:", req.user);
+    const userId = req.user.id;
     const updates = req.body;
 
+    // Handle image upload
+    if (req.file) {
+      updates.profileImage = `/uploads/${req.file.filename}`;
+    }
+
+    // Prevent restricted updates
     delete updates.userType;
     delete updates.password;
     delete updates._id;
@@ -115,14 +121,29 @@ export const updateUser = async (req, res) => {
       { new: true }
     );
 
-    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+    if (!updatedUser)
+      return res.status(404).json({ message: "User not found" });
 
-    res.status(200).json({ message: "User profile updated", user: updatedUser });
+    res.status(200).json({
+      message: "User profile updated",
+      user: updatedUser
+    });
 
   } catch (err) {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
+// get All users
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password"); // Exclude password
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch users", error: err.message });
+  }
+};
+
 
 // ✅ Delete user
 export const deleteUser = async (req, res) => {
@@ -137,3 +158,22 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+// GET /me
+export const getMe = async (req, res) => {
+  const user = await User.findById(req.user.id).select("-password");
+  res.status(200).json(user);
+};
+
+// GET /:id (admin)
+export const getUserById = async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password");
+  if (!user) return res.status(404).json({ message: "User not found" });
+  res.status(200).json(user);
+};
+// userController.js
+export const logoutUser = async (req, res) => {
+  // No need to do anything to the token since JWT is stateless
+  res.status(200).json({ message: "User logged out successfully" });
+};
+
+

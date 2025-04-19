@@ -5,6 +5,7 @@ import cors from 'cors'
 import userRoutes from './routes/userRoutes.js'
 import driverRoutes from './routes/driverRoutes.js'
 import RideRequestRoutes from './routes/RideRequestRoutes.js'
+import authRoutes from './routes/authRoutes.js'
 
 dotenv.config();
 connectDB();
@@ -12,7 +13,9 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use('/api/users',userRoutes);
+app.use("/uploads", express.static("uploads"));
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use('/api/driver',driverRoutes);
 app.use('/api/rides', RideRequestRoutes); // Add this line
 

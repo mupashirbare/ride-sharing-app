@@ -5,11 +5,19 @@ import {
   updateDriverProfile,
   approveDriver
 } from "../controllers/driverController.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-// Register a new driver (creates User + DriverProfile)
-router.post("/register", registerDriver);
+// Accept image in register
+router.post(
+  "/register",
+  upload.fields([
+    { name: "licenseImage", maxCount: 1 },
+    { name: "profileImage", maxCount: 1 }
+  ]),
+  registerDriver
+);
 
 // Get driver profile by user ID
 router.get("/profile/:userId", getDriverProfile);
