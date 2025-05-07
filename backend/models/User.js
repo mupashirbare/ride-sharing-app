@@ -4,79 +4,25 @@ import bcrypt from "bcryptjs";
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name is required'],
-    trim: true
+    trim: true,
+    // required: true
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    trim: true,
     lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters']
+    sparse: true,
+    unique: true,
+    // required: true
   },
   phone: {
     type: String,
-    required: [true, 'Phone number is required'],
-    match: [/^\+?[\d\s-]+$/, 'Please enter a valid phone number']
+    unique: true,
+    required: true
   },
-  role: {
+  password: {
     type: String,
-    enum: ['driver', 'rider', 'admin'],
-    default: 'rider'
+    // required: true
   },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
-  location: {
-    type: {
-      type: String,
-      enum: ['Point'],
-      default: 'Point'
-    },
-    coordinates: {
-      type: [Number],
-      required: true,
-      validate: {
-        validator: function(v) {
-          return v.length === 2 && 
-                 v[0] >= -180 && v[0] <= 180 && 
-                 v[1] >= -90 && v[1] <= 90;
-        },
-        message: 'Invalid coordinates'
-      }
-    }
-  },
-  profileImage: String,
-  rating: {
-    type: Number,
-    min: 0,
-    max: 5,
-    default: 0
-  },
-  totalRides: {
-    type: Number,
-    default: 0
-  },
-  vehicleInfo: {
-    type: {
-      model: String,
-      color: String,
-      plateNumber: String,
-      year: Number
-    },
-    required: function() {
-      return this.role === 'driver';
-    }
-  },
-  documents: [{
-    type: {
   userType: {
     type: String,
     enum: ["passenger", "driver", "admin"],
