@@ -1,21 +1,28 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'routes/app_routes.dart';
-import 'routes/app_pages.dart';
 import 'services/location_service.dart';
-import 'controllers/home_controller.dart'; // <--- Important to add
+import 'controllers/home_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set preferred orientations
+  // ✅ Make status bar white with dark icons
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ),
+  );
+
+  // Lock portrait mode
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  // Initialize essential controllers
+  // Inject controllers
   Get.put(LocationService(), permanent: true);
-  Get.put(HomeController(), permanent: true); // <-- ADD this line ✅
+  Get.put(HomeController(), permanent: true);
 
   runApp(const MyApp());
 }
@@ -29,7 +36,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SafarX',
       initialRoute: AppRoutes.splash,
-      getPages: AppPages.pages, // <-- YOU FORGOT: Use AppPages.pages ✅
+      getPages: AppRoutes.routes, // ✅ Correct
       defaultTransition: Transition.fadeIn,
       theme: ThemeData(
         primaryColor: const Color(0xFF0B3D2E),
@@ -38,7 +45,7 @@ class MyApp extends StatelessWidget {
           primary: const Color(0xFF0B3D2E),
           secondary: Colors.green,
         ),
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: Colors.white, // ✅ Ensure full white background
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           elevation: 0,

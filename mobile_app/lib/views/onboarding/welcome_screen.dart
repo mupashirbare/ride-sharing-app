@@ -55,7 +55,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void _navigateToHome() {
     // Using Get.offAllNamed to remove all previous routes from the stack
     // This ensures user can't go back to welcome screen using back button
-    Get.offAllNamed(AppRoutes.home);
+    Get.offAllNamed(AppRoutes.login);
   }
 
   @override

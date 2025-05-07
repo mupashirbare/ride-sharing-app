@@ -1,10 +1,10 @@
 // lib/routes/app_routes.dart
 import 'package:get/get.dart';
+import 'package:mobile_app/auth/login_screen.dart';
 import '../bindings/home_binding.dart';
 import '../views/home/home_screen.dart'; // <-- Correct import
 import '../views/onboarding/splash_screen.dart';
 import '../views/onboarding/welcome_screen.dart';
-
 abstract class AppRoutes {
   static const String splash = '/';
   static const String welcome = '/welcome';
@@ -29,6 +29,11 @@ abstract class AppRoutes {
       page: () => const WelcomeScreen(),
       transition: Transition.fadeIn,
     ),
+     GetPage(
+        name: login,
+        page: () => LoginScreen(), // 👈 Add this
+        transition: Transition.rightToLeft,
+      ),
     GetPage(
       name: home,
       page: () => const HomeScreen(), // <-- Correct: HomeScreen not HomeView
