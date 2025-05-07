@@ -1,5 +1,8 @@
+// lib/views/onboarding/welcome_screen.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // Add this import
+import '../../routes/app_routes.dart'; // Add this import
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -49,6 +52,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     super.dispose();
   }
 
+  void _navigateToHome() {
+    // Using Get.offAllNamed to remove all previous routes from the stack
+    // This ensures user can't go back to welcome screen using back button
+    Get.offAllNamed(AppRoutes.login);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,13 +89,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       left: 24,
                       right: 24,
                       child: ElevatedButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Login screen coming soon ..."),
-                            ),
-                          );
-                        },
+                        onPressed:
+                            _navigateToHome, // Updated to use navigation function
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0B3D2E),
                           minimumSize: const Size(double.infinity, 50),
@@ -94,7 +98,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: const Text(
                           "Get Started",
                           style: TextStyle(
-                            color: Colors.white, // ✅ White text
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

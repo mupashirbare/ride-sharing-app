@@ -1,0 +1,29 @@
+name: ride_sharing_app
+description: A ride sharing application similar to Uber
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.19.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_maps_flutter: ^2.5.0
+  geolocator: ^10.1.0
+  http: ^1.1.0
+  provider: ^6.0.5
+  flutter_polyline_points: ^2.0.0
+  cupertino_icons: ^1.0.6
+  dio: ^5.3.3
+  flutter_dotenv: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
+    - assets/images/ 
