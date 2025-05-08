@@ -6,38 +6,84 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // ✅ Generate JWT
 const generateToken = (user) => {
-  return jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
-
-// ✅ Passenger Login via Phone
-export const verifyPhone = async (req, res) => {
+// ✅ Register user via email & password with profile image
+export const registerUser = async (req, res) => {
   try {
-    const phone = req.body.phone?.trim();
-    if (!phone) return res.status(400).json({ message: "Phone number is required" });
+    const { name, email, phone, password, isAdmin } = req.body;
 
-    let user = await User.findOne({ phone, userType: "passenger" });
-
-    if (!user) {
-      user = new User({
-        phone,
-        userType: "passenger",
-        name: "New Passenger",
-        authProvider: "local"
-      });
-      await user.save();
+    if (!email || !password || !phone) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    const token = generateToken(user);
-    res.status(200).json({ message: "Passenger authenticated", user, token });
+    // Check if user already exists
+    const existing = await User.findOne({ $or: [{ email }, { phone }] });
+    if (existing) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // ✅ Handle profile image upload
+    const profileImagePath = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+    // ✅ Only allow admin creation if current user is an admin
+    let allowAdmin = false;
+
+    if (req.user && req.user.isAdmin) {
+      allowAdmin = true;
+    }
+
+    const newUser = new User({
+      name,
+      email,
+      phone,
+      password,
+      profileImage: profileImagePath,
+    // ✅ Secure version:
+    isAdmin: req.user?.isAdmin ? (isAdmin === 'true' || isAdmin === true) : false,
+      authProvider: "local"
+    });
+
+    await newUser.save();
+
+    const token = generateToken(newUser);
+    res.status(201).json({ message: "User registered", user: newUser, token });
 
   } catch (err) {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
 
-// ✅ Admin or Driver Login
+
+
+// ✅ Phone Login (create user if not exists)
+export const verifyPhone = async (req, res) => {
+  try {
+    const phone = req.body.phone?.trim();
+    if (!phone) return res.status(400).json({ message: "Phone number is required" });
+
+    let user = await User.findOne({ phone });
+
+    if (!user) {
+      user = new User({
+        phone,
+        name: "New User",
+        authProvider: "local"
+      });
+      await user.save();
+    }
+
+    const token = generateToken(user);
+    res.status(200).json({ message: "User authenticated", user, token });
+
+  } catch (err) {
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+// ✅ Login via email/phone + password (for admin and driver)
 export const loginUser = async (req, res) => {
   try {
     const { usernameOrEmail, password } = req.body;
@@ -47,10 +93,6 @@ export const loginUser = async (req, res) => {
     });
 
     if (!user) return res.status(404).json({ message: "User not found" });
-
-    if (user.userType === "passenger") {
-      return res.status(400).json({ message: "Passengers use phone login only" });
-    }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
@@ -63,7 +105,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// ✅ Google Login (new)
+// ✅ Google Login
 export const googleLogin = async (req, res) => {
   try {
     const { idToken } = req.body;
@@ -83,8 +125,7 @@ export const googleLogin = async (req, res) => {
         name,
         email,
         phone: "not-set",
-        password: "google-auth", // dummy
-        userType: "passenger",   // or ask role selection later
+        password: "google-auth", // not used
         profileImage: picture,
         authProvider: "google"
       });
@@ -98,22 +139,21 @@ export const googleLogin = async (req, res) => {
     res.status(500).json({ message: "Google login failed", error: err.message });
   }
 };
-//update user
+
+// ✅ Update user profile
 export const updateUser = async (req, res) => {
   try {
-    console.log("🔐 req.user:", req.user);
     const userId = req.user.id;
     const updates = req.body;
 
-    // Handle image upload
     if (req.file) {
       updates.profileImage = `/uploads/${req.file.filename}`;
     }
 
-    // Prevent restricted updates
-    delete updates.userType;
+    // Block sensitive fields
     delete updates.password;
     delete updates._id;
+    delete updates.isAdmin;
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
@@ -134,16 +174,15 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// get All users
+// ✅ Get all users (admin only)
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password"); // Exclude password
+    const users = await User.find().select("-password");
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch users", error: err.message });
   }
 };
-
 
 // ✅ Delete user
 export const deleteUser = async (req, res) => {
@@ -158,22 +197,21 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
-// GET /me
+
+// ✅ Get current logged-in user
 export const getMe = async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");
   res.status(200).json(user);
 };
 
-// GET /:id (admin)
+// ✅ Get user by ID (admin only)
 export const getUserById = async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
   if (!user) return res.status(404).json({ message: "User not found" });
   res.status(200).json(user);
 };
-// userController.js
+
+// ✅ Stateless logout
 export const logoutUser = async (req, res) => {
-  // No need to do anything to the token since JWT is stateless
   res.status(200).json({ message: "User logged out successfully" });
 };
-
-

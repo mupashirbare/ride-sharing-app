@@ -2,29 +2,23 @@ import mongoose from "mongoose";
 import DriverProfile from "../models/DriverProfile.js";
 import User from "../models/User.js";
 
-// ✅ Register Driver Profile (for existing driver user)
+// ✅ Register Driver Profile (user becomes a driver here)
 export const registerDriver = async (req, res) => {
   try {
-    const {
-      userId,
-      vehicleType,
-      vehicleModel,
-      plateNumber,
-    } = req.body;
+    const { userId, vehicleType, vehicleModel, plateNumber } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid userId format" });
     }
 
     const files = req.files;
-
     const licenseImagePath = files?.licenseImage
       ? `/uploads/${files.licenseImage[0].filename}`
       : null;
 
     const user = await User.findById(userId);
-    if (!user || user.userType !== "driver") {
-      return res.status(400).json({ message: "User not found or not a driver" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
     const existingProfile = await DriverProfile.findOne({ userId });
@@ -48,12 +42,10 @@ export const registerDriver = async (req, res) => {
       message: "Driver profile created",
       profile: populatedProfile
     });
-
   } catch (err) {
     res.status(500).json({
       message: "Server Error",
-      error: err.message,
-      stack: err.stack // Remove in production
+      error: err.message
     });
   }
 };
@@ -112,7 +104,7 @@ export const updateDriverProfile = async (req, res) => {
   }
 };
 
-// ✅ Approve Driver (Admin only)
+// ✅ Admin Approves Driver
 export const approveDriver = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -136,3 +128,31 @@ export const approveDriver = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+export const getAllDrivers = async (req, res) => {
+  try {
+    const drivers = await DriverProfile.find()
+      .populate("userId", "name email phone  profileImage");
+
+    res.status(200).json(drivers);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch drivers", error: err.message });
+  }
+};
+export const getDriversByStatus = async (req, res) => {
+  try {
+    const { approved } = req.query;
+
+    const filter = {};
+    if (approved === "true") filter.isApproved = true;
+    else if (approved === "false") filter.isApproved = false;
+
+    const drivers = await DriverProfile.find(filter)
+      .populate("userId", "name email phone profileImage");
+
+    res.status(200).json(drivers);
+  } catch (err) {
+    res.status(500).json({ message: "Error", error: err.message });
+  }
+};
+
+
