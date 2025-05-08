@@ -4,15 +4,13 @@ import bcrypt from "bcryptjs";
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    trim: true,
-    // required: true
+    trim: true
   },
   email: {
     type: String,
     lowercase: true,
     sparse: true,
-    unique: true,
-    // required: true
+    unique: true
   },
   phone: {
     type: String,
@@ -20,31 +18,35 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   password: {
-    type: String,
-    // required: true
-  },
-  userType: {
-    type: String,
-    enum: ["passenger", "driver", "admin"],
-    required: true
+    type: String
   },
   profileImage: {
     type: String, // URL to the profile picture
     default: "https://example.com/default-profile.png"
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false // ✅ becomes true only if promoted manually
+  },
+  authProvider: {
+    type: String,
+    enum: ["local", "google"],
+    default: "local"
   },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
-// Automatically hash password if modified
+
+// ✅ Automatically hash password if modified
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password") || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-// ✅ Add a method to compare password
+// ✅ Method to compare passwords
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
