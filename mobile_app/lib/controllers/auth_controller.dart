@@ -1,22 +1,26 @@
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'dart:convert'; // ✅ required for jsonEncode and jsonDecode
 import 'package:get/get.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:get_storage/get_storage.dart'; // if using local storage
 
 class AuthController extends GetxController {
-  var selectedCountry = Country(
-    phoneCode: '252',
-    countryCode: 'SO',
-    e164Sc: 0,
-    geographic: true,
-    level: 1,
-    name: 'Somalia',
-    example: '612345678',
-    displayName: 'Somalia',
-    displayNameNoCountryCode: 'SO',
-    e164Key: '',
-  ).obs;
+  var selectedCountry =
+      Country(
+        phoneCode: '252',
+        countryCode: 'SO',
+        e164Sc: 0,
+        geographic: true,
+        level: 1,
+        name: 'Somalia',
+        example: '612345678',
+        displayName: 'Somalia',
+        displayNameNoCountryCode: 'SO',
+        e164Key: '',
+      ).obs;
 
   var phoneNumber = ''.obs;
 
@@ -29,7 +33,31 @@ class AuthController extends GetxController {
     try {
       final result = await googleSignIn.signIn();
       if (result != null) {
-        Get.snackbar("Success", "Signed in as ${result.displayName}");
+        final googleAuth = await result.authentication;
+        final idToken = googleAuth.idToken;
+
+        final response = await http.post(
+          Uri.parse("http://your-api-url.com/api/auth/google-login"),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'idToken': idToken}),
+        );
+
+        print("Status: ${response.statusCode}");
+        print("Body: ${response.body}");
+
+        if (response.statusCode == 200) {
+          try {
+            final data = jsonDecode(response.body);
+            final box = GetStorage();
+            box.write('token', data['token']);
+            box.write('user', data['user']);
+            Get.snackbar("Success", "Welcome ${data['user']['name']}");
+          } catch (e) {
+            Get.snackbar("Error", "Invalid JSON response");
+          }
+        } else {
+          Get.snackbar("Login Failed", "Status: ${response.statusCode}");
+        }
       }
     } catch (e) {
       Get.snackbar("Error", e.toString());
