@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:country_picker/country_picker.dart';
 import '../../../controllers/auth_controller.dart';
 import '../views/home/widgets/custom_button.dart';
+import '../views/widgets/top_circles.dart';
 
 class LoginScreen extends StatelessWidget {
   final AuthController authController = Get.put(AuthController());
@@ -10,39 +11,13 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
-
       body: Stack(
         clipBehavior: Clip.none,
         children: [
-          // 🎨 Decorative Top-Right Circles
-          Positioned(
-            top: -40,
-            right: -30,
-            child: Container(
-              height: 160,
-              width: 160,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color.fromARGB(255, 122, 166, 149),
-              ),
-            ),
-          ),
-          Positioned(
-            top: -20,
-            right: -20,
-            child: Container(
-              height: 130,
-              width: 130,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF24815E), // solid green // Light ring effect
-              ),
-            ),
-          ),
+          // ✅ Background Circles
+          const TopCircles(),
 
-          // 📱 Main Content
+          // 📱 Foreground Content
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -57,11 +32,12 @@ class LoginScreen extends StatelessWidget {
                     height: 220,
                   ),
 
-                  // Title
+                  const SizedBox(height: 16),
                   const Text(
                     "Enter your number",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+
                   const SizedBox(height: 24),
 
                   // 📞 Phone Number Input
@@ -70,7 +46,7 @@ class LoginScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: const Color(0xFFF5F5F5), // Light grey fill
+                        color: const Color(0xFFF5F5F5),
                       ),
                       child: Row(
                         children: [
@@ -93,6 +69,7 @@ class LoginScreen extends StatelessWidget {
                                       .flagEmoji,
                                   style: const TextStyle(fontSize: 18),
                                 ),
+                                const SizedBox(width: 4),
                                 Text(
                                   '+${authController.selectedCountry.value.phoneCode}',
                                 ),
@@ -115,9 +92,10 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 34),
 
-                  // Divider with OR
+                  // Divider
                   Row(
                     children: const [
                       Expanded(child: Divider(thickness: 1)),
@@ -128,9 +106,10 @@ class LoginScreen extends StatelessWidget {
                       Expanded(child: Divider(thickness: 1)),
                     ],
                   ),
+
                   const SizedBox(height: 34),
 
-                  // 🌐 Google Button
+                  // 🌐 Google Sign-In
                   CustomButton(
                     iconWidget: Image.asset('image/google.png', height: 24),
                     text: "Sign in with Google",
@@ -138,7 +117,8 @@ class LoginScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 12),
-                  // 📘 Facebook Button
+
+                  // 📘 Facebook Sign-In
                   CustomButton(
                     iconData: Icons.facebook,
                     text: "Sign in with Facebook",
@@ -147,7 +127,7 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 60),
 
-                  // Terms & Privacy Policy
+                  // 📝 Terms & Privacy
                   Text.rich(
                     TextSpan(
                       text: "By signing up, you agree to our ",

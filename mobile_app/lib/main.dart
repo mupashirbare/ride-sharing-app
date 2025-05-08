@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
+import 'package:get_storage/get_storage.dart'; // ✅ Import GetStorage
+
 import 'routes/app_routes.dart';
 import 'services/location_service.dart';
 import 'controllers/home_controller.dart';
@@ -8,10 +10,13 @@ import 'controllers/home_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // ✅ Init local storage
+  await GetStorage.init(); // REQUIRED before using it
+
   // ✅ Make status bar white with dark icons
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
+      statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
     ),
@@ -36,7 +41,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SafarX',
       initialRoute: AppRoutes.splash,
-      getPages: AppRoutes.routes, // ✅ Correct
+      getPages: AppRoutes.routes,
       defaultTransition: Transition.fadeIn,
       theme: ThemeData(
         primaryColor: const Color(0xFF0B3D2E),
@@ -45,7 +50,7 @@ class MyApp extends StatelessWidget {
           primary: const Color(0xFF0B3D2E),
           secondary: Colors.green,
         ),
-        scaffoldBackgroundColor: Colors.white, // ✅ Ensure full white background
+        scaffoldBackgroundColor: Colors.white,
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           elevation: 0,
