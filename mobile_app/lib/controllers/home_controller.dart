@@ -87,9 +87,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> getRoute() async {
-    if (pickupPosition.value == null || destinationPosition.value == null) {
+    if (pickupPosition.value == null || destinationPosition.value == null)
       return;
-    }
 
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
