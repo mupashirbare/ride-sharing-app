@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_app/views/onboarding/splash_screen.dart';
-import 'routes/app_routes.dart';
 import 'services/location_service.dart';
 import 'controllers/home_controller.dart';
 

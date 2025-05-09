@@ -7,6 +7,8 @@ import '../views/home/widgets/custom_button.dart';
 class LoginScreen extends StatelessWidget {
   final AuthController authController = Get.put(AuthController());
 
+  LoginScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
