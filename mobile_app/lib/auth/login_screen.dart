@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:country_picker/country_picker.dart';
 import '../../../controllers/auth_controller.dart';
 import '../views/home/widgets/custom_button.dart';
-import '../../../routes/app_routes.dart';
 
 class LoginScreen extends StatelessWidget {
   final AuthController authController = Get.put(AuthController());
@@ -13,6 +12,7 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
+
       body: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -37,7 +37,7 @@ class LoginScreen extends StatelessWidget {
               width: 130,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color(0xFF24815E),
+                color: Color(0xFF24815E), // solid green // Light ring effect
               ),
             ),
           ),
@@ -57,10 +57,12 @@ class LoginScreen extends StatelessWidget {
                     height: 220,
                   ),
 
+                  // Title
                   const Text(
                     "Enter your number",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+
                   const SizedBox(height: 24),
 
                   // 📞 Phone Input
@@ -92,6 +94,7 @@ class LoginScreen extends StatelessWidget {
                                       .flagEmoji,
                                   style: const TextStyle(fontSize: 18),
                                 ),
+                                const SizedBox(width: 4),
                                 Text(
                                   '+${authController.selectedCountry.value.phoneCode}',
                                 ),
@@ -117,6 +120,7 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 34),
 
+                  // Divider with OR
                   Row(
                     children: const [
                       Expanded(child: Divider(thickness: 1)),
@@ -130,6 +134,7 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 34),
 
+                  // 🌐 Google Button
                   CustomButton(
                     iconWidget: Image.asset('image/google.png', height: 24),
                     text: "Sign in with Google",
@@ -137,7 +142,7 @@ class LoginScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 12),
-
+                  // 📘 Facebook Button
                   CustomButton(
                     iconData: Icons.facebook,
                     text: "Sign in with Facebook",
@@ -146,24 +151,7 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // 🔘 Skip Button
-                  TextButton(
-                    onPressed: () {
-                      Get.offAllNamed(AppRoutes.home);
-                    },
-                    child: const Text(
-                      'Skip for now',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
+                  // Terms & Privacy Policy
                   Text.rich(
                     TextSpan(
                       text: "By signing up, you agree to our ",
