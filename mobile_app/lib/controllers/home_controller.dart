@@ -1,11 +1,10 @@
 // lib/controllers/home_controller.dart
-import 'dart:async';
-import 'dart:math' as math;
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:http/http.dart' as http;
 
 class HomeController extends GetxController {
   GoogleMapController? mapController;
@@ -24,7 +23,10 @@ class HomeController extends GetxController {
   final RxDouble estimatedFare = 0.0.obs;
   final RxDouble estimatedDistance = 0.0.obs;
 
-  static const String _googleApiKey = 'YOUR_GOOGLE_API_KEY'; // Replace this
+  final RxInt currentTabIndex = 0.obs;
+
+  final String _apiKey =
+      '5b3ce3597851110001cf6248df54332d06dd4da58c4ec72a71d2367c';
 
   @override
   void onInit() {
@@ -34,9 +36,9 @@ class HomeController extends GetxController {
 
   Future<void> getCurrentLocation() async {
     try {
-      Position position = await Geolocator.getCurrentPosition();
+      final position = await Geolocator.getCurrentPosition();
       pickupPosition.value = LatLng(position.latitude, position.longitude);
-      pickupAddress.value = "Current Location";
+      pickupAddress.value = "You are here";
 
       markers.add(
         Marker(
@@ -54,106 +56,85 @@ class HomeController extends GetxController {
         ),
       );
     } catch (e) {
-      print('Error getting location: $e');
+      print('Error: $e');
     }
   }
 
-  void updateDestination(String value) async {
-    if (value.isEmpty) return;
+  void setDestinationFromPlace(String label, LatLng location) {
+    destinationPosition.value = location;
+    destinationAddress.value = label;
 
-    try {
-      List<String> parts = value.split(',');
-      double lat = double.parse(parts[0].trim());
-      double lng = double.parse(parts[1].trim());
+    markers.add(
+      Marker(
+        markerId: const MarkerId('destination'),
+        position: location,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ),
+    );
 
-      destinationPosition.value = LatLng(lat, lng);
-      destinationAddress.value = "Destination Selected";
-
-      markers.add(
-        Marker(
-          markerId: const MarkerId('destination'),
-          position: destinationPosition.value!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        ),
-      );
-
-      await getRoute();
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Please enter coordinates like: latitude,longitude',
-      );
-    }
+    getRoute();
   }
 
   Future<void> getRoute() async {
     if (pickupPosition.value == null || destinationPosition.value == null)
       return;
 
-    PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      request: PolylineRequest(
-        origin: PointLatLng(
-          pickupPosition.value!.latitude,
-          pickupPosition.value!.longitude,
-        ),
-        destination: PointLatLng(
-          destinationPosition.value!.latitude,
-          destinationPosition.value!.longitude,
-        ),
-        mode: TravelMode.driving,
-      ),
+    final url = Uri.parse(
+      'https://api.openrouteservice.org/v2/directions/driving-car',
     );
+    final headers = {
+      'Authorization': _apiKey,
+      'Content-Type': 'application/json',
+    };
+    final body = jsonEncode({
+      'coordinates': [
+        [pickupPosition.value!.longitude, pickupPosition.value!.latitude],
+        [
+          destinationPosition.value!.longitude,
+          destinationPosition.value!.latitude,
+        ],
+      ],
+    });
 
-    if (result.points.isNotEmpty) {
-      List<LatLng> polylineCoordinates =
-          result.points
-              .map((point) => LatLng(point.latitude, point.longitude))
-              .toList();
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final coords = data['features'][0]['geometry']['coordinates'] as List;
+        final points = coords.map((c) => LatLng(c[1], c[0])).toList();
 
-      polylines.clear();
-      polylines.add(
-        Polyline(
-          polylineId: const PolylineId('route'),
-          points: polylineCoordinates,
-          width: 5,
-          color: Colors.green,
-        ),
-      );
+        polylines.clear();
+        polylines.add(
+          Polyline(
+            polylineId: const PolylineId('route'),
+            points: points,
+            color: Colors.green,
+            width: 5,
+          ),
+        );
 
-      double distance = _calculateTotalDistance(polylineCoordinates);
-      estimatedDistance.value = distance;
-      estimatedFare.value = 2 + (distance * 0.5);
+        final distMeters =
+            data['features'][0]['properties']['summary']['distance'];
+        final distanceKm = (distMeters as num) / 1000.0;
+        estimatedDistance.value = distanceKm;
+        estimatedFare.value = 2 + (distanceKm * 0.5);
+      } else {
+        Get.snackbar(
+          'Error',
+          'Could not fetch route. Check OpenRouteService key or locations.',
+        );
+      }
+    } catch (e) {
+      print('Route Error: $e');
+      Get.snackbar('Error', 'Failed to fetch route');
     }
   }
 
-  double _calculateTotalDistance(List<LatLng> points) {
-    double totalDistance = 0.0;
-    for (int i = 0; i < points.length - 1; i++) {
-      totalDistance += _coordinateDistance(
-        points[i].latitude,
-        points[i].longitude,
-        points[i + 1].latitude,
-        points[i + 1].longitude,
-      );
-    }
-    return totalDistance;
+  void changeTabIndex(int index) {
+    currentTabIndex.value = index;
   }
 
-  double _coordinateDistance(
-    double lat1,
-    double lon1,
-    double lat2,
-    double lon2,
-  ) {
-    const double p = 0.017453292519943295; // Math.PI / 180
-    final double a =
-        0.5 -
-        math.cos((lat2 - lat1) * p) / 2 +
-        math.cos(lat1 * p) *
-            math.cos(lat2 * p) *
-            (1 - math.cos((lon2 - lon1) * p)) /
-            2;
-    return 12742 * math.asin(math.sqrt(a)); // Distance in KM
+  void sendPickupRequest() {
+    Get.snackbar("Ride Requested", "Searching for drivers...");
   }
 }

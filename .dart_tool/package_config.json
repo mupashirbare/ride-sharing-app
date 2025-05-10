@@ -195,7 +195,7 @@
     },
     {
       "name": "http",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.3.0",
+      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -267,7 +267,7 @@
     },
     {
       "name": "provider",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/provider-6.1.4",
+      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/provider-6.1.5",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -368,7 +368,7 @@
       "languageVersion": "2.19"
     }
   ],
-  "generated": "2025-04-28T06:07:23.023894Z",
+  "generated": "2025-05-09T08:08:42.177569Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///C:/flutter",

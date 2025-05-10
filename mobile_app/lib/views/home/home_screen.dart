@@ -1,181 +1,144 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-import '../widgets/location_search_box.dart';
-import '../widgets/ride_bottom_sheet.dart';
+import '../../controllers/home_controller.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends GetView<HomeController> {
   const HomeScreen({super.key});
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-class _HomeScreenState extends State<HomeScreen> {
-  final Completer<GoogleMapController> _controller = Completer();
-  final Set<Marker> _markers = {};
-  final Set<Polyline> _polylines = {};
 
-  LatLng? _currentLocation;
-  LatLng? _pickupLocation;
-  LatLng? _destinationLocation;
-  bool _isLoading = true;
-  bool _showLocationList = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
-  }
-
-  Future<void> _getCurrentLocation() async {
+  LatLng _parseLatLng(String input) {
     try {
-      final position = await Geolocator.getCurrentPosition();
-      setState(() {
-        _currentLocation = LatLng(position.latitude, position.longitude);
-        _isLoading = false;
-      });
-      _addCurrentLocationMarker();
+      final parts = input.split(',');
+      final lat = double.parse(parts[0].trim());
+      final lng = double.parse(parts[1].trim());
+      return LatLng(lat, lng);
     } catch (e) {
-      print('Error getting location: $e');
-      setState(() => _isLoading = false);
+      return const LatLng(2.0469, 45.3182); // Default: Mogadishu
     }
-  }
-
-  void _addCurrentLocationMarker() {
-    if (_currentLocation == null) return;
-
-    setState(() {
-      _markers.add(
-        Marker(
-          markerId: const MarkerId('current_location'),
-          position: _currentLocation!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        ),
-      );
-    });
-  }
-
-  void _onLocationSelected(LatLng location, bool isDestination) {
-    setState(() {
-      if (isDestination) {
-        _destinationLocation = location;
-        _markers.add(
-          Marker(
-            markerId: const MarkerId('destination'),
-            position: location,
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueRed,
-            ),
-          ),
-        );
-      } else {
-        _pickupLocation = location;
-        _markers.add(
-          Marker(
-            markerId: const MarkerId('pickup'),
-            position: location,
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueGreen,
-            ),
-          ),
-        );
-      }
-      _showLocationList = false;
-    });
-
-    if (_pickupLocation != null && _destinationLocation != null) {
-      _showRideBottomSheet();
-    }
-  }
-
-  void _showRideBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder:
-          (context) => RideBottomSheet(
-            pickup: _pickupLocation!,
-            destination: _destinationLocation!,
-            onRequest: _onRideRequested,
-          ),
-    );
-  }
-
-  void _onRideRequested() {
-    // TODO: Implement ride request
-    print('Ride requested');
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
     return Scaffold(
-      body: Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: _currentLocation ?? const LatLng(0, 0),
-              zoom: 15,
+      body: Obx(
+        () => Stack(
+          children: [
+            // Google Map
+            GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target:
+                    controller.pickupPosition.value ??
+                    const LatLng(2.0469, 45.3182),
+                zoom: 15,
+              ),
+              onMapCreated: (GoogleMapController mapController) {
+                controller.mapController = mapController;
+              },
+              markers: controller.markers,
+              polylines: controller.polylines,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
             ),
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-            },
-            markers: _markers,
-            polylines: _polylines,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            onTap: (LatLng location) {
-              if (_showLocationList) {
-                setState(() => _showLocationList = false);
-              }
-            },
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  LocationSearchBox(
-                    onFocus: () => setState(() => _showLocationList = true),
-                    onLocationSelected:
-                        (location) => _onLocationSelected(
-                          location,
-                          _pickupLocation == null,
-                        ),
-                  ),
-                  if (_showLocationList)
+
+            // Current location info
+            Positioned(
+              top: 60,
+              left: 20,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.my_location, color: Colors.green),
+                    const SizedBox(width: 10),
                     Expanded(
-                      child: Card(
-                        margin: const EdgeInsets.only(top: 8),
-                        child: ListView(
-                          children: [
-                            ListTile(
-                              leading: const Icon(Icons.location_on),
-                              title: const Text('Current Location'),
-                              onTap: () {
-                                if (_currentLocation != null) {
-                                  _onLocationSelected(
-                                    _currentLocation!,
-                                    _pickupLocation == null,
-                                  );
-                                }
-                              },
-                            ),
-                            // Add more suggested locations here
-                          ],
+                      child: Text(
+                        controller.pickupAddress.value.isNotEmpty
+                            ? controller.pickupAddress.value
+                            : 'Locating you...',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+
+            // Destination input
+            Positioned(
+              bottom: 20,
+              left: 20,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.search, color: Colors.green),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: controller.destinationController,
+                        decoration: const InputDecoration(
+                          hintText: 'Where are you going? (lat,lng)',
+                          border: InputBorder.none,
+                        ),
+                        onSubmitted: (value) {
+                          final LatLng dest = _parseLatLng(value);
+                          controller.setDestinationFromPlace('Custom', dest);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Fare info box
+            if (controller.estimatedFare.value > 0)
+              Positioned(
+                bottom: 100,
+                left: 20,
+                right: 20,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade700,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    'Estimated Fare: \$${controller.estimatedFare.value.toStringAsFixed(2)}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
