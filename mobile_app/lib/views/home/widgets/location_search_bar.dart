@@ -6,10 +6,10 @@ class LocationSearchBar extends StatelessWidget {
   final VoidCallback onTap;
 
   const LocationSearchBar({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

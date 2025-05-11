@@ -11,6 +11,8 @@ export const registerDriver = async (req, res) => {
       return res.status(400).json({ message: "Invalid userId format" });
     }
 
+    currentUser=req.user;
+
     const files = req.files;
     const licenseImagePath = files?.licenseImage
       ? `/uploads/${files.licenseImage[0].filename}`
@@ -27,7 +29,7 @@ export const registerDriver = async (req, res) => {
     }
 
     const driverProfile = new DriverProfile({
-      userId,
+      userId: currentUser._id,
       vehicleType,
       vehicleModel,
       plateNumber,
