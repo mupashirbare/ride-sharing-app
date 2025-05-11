@@ -130,3 +130,7 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 }
+
+extension on HomeController {
+  void updateDestination(String value) {}
+}

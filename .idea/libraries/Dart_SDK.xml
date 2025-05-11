@@ -1,29 +1,37 @@
 <component name="libraryTable">
-  <library name="Dart SDK">
+  <library name="Dart Packages" type="DartPackagesLibraryType">
+    <properties>
+      <option name="packageNameToDirsMap">
+        <!-- Cleaned entries: only $USER_HOME$ format kept -->
+        <entry key="async">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/async-2.12.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="boolean_selector">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/boolean_selector-2.1.2/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="characters">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/characters-1.4.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <!-- Add other entries here following the same format -->
+      </option>
+    </properties>
     <CLASSES>
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/_internal" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/async" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/cli" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/collection" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/concurrent" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/convert" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/core" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/developer" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/ffi" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/html" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/indexed_db" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/io" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/isolate" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/js" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/js_interop" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/js_interop_unsafe" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/js_util" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/math" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/mirrors" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/svg" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/typed_data" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/web_audio" />
-      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/web_gl" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/async-2.12.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/boolean_selector-2.1.2/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/characters-1.4.0/lib" />
+      <!-- Add other root entries similarly -->
     </CLASSES>
     <JAVADOC />
     <SOURCES />
