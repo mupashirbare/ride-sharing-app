@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // ✅ required for jsonEncode and jsonDecode
 import 'package:get/get.dart';
@@ -27,39 +28,41 @@ class AuthController extends GetxController {
     phoneNumber.value = value;
   }
 
-  void signInWithGoogle() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
+  Future<void> signInWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      serverClientId:
+          '1098662333780-1oeod80vohslosm8048amqomfmiabeah.apps.googleusercontent.com',
+    );
+
     try {
       final result = await googleSignIn.signIn();
       if (result != null) {
         final googleAuth = await result.authentication;
         final idToken = googleAuth.idToken;
 
+        if (idToken == null) {
+          Get.snackbar("Error", "Google ID Token is null.");
+          return;
+        }
+
         final response = await http.post(
-          Uri.parse("http://your-api-url.com/api/auth/google-login"),
+          Uri.parse("http://10.0.2.2:5000/api/auth/google-login"),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'idToken': idToken}),
         );
 
-        print("Status: ${response.statusCode}");
-        print("Body: ${response.body}");
-
         if (response.statusCode == 200) {
-          try {
-            final data = jsonDecode(response.body);
-            final box = GetStorage();
-            box.write('token', data['token']);
-            box.write('user', data['user']);
-            Get.snackbar("Success", "Welcome ${data['user']['name']}");
-          } catch (e) {
-            Get.snackbar("Error", "Invalid JSON response");
-          }
+          final data = jsonDecode(response.body);
+          final box = GetStorage();
+          box.write('token', data['token']);
+          box.write('user', data['user']);
+          Get.snackbar("Welcome", "Hi ${data['user']['name']}");
         } else {
-          Get.snackbar("Login Failed", "Status: ${response.statusCode}");
+          Get.snackbar("Login Failed", "Server error: ${response.statusCode}");
         }
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      Get.snackbar("Google Sign-In Error", e.toString());
     }
   }
 

@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { OAuth2Client } from "google-auth-library";
-
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+import dotenv from "dotenv";
+const client = new OAuth2Client("1098662333780-1oeod80vohslosm8048amqomfmiabeah.apps.googleusercontent.com");
 
 // ✅ Generate JWT
 const generateToken = (user) => {
@@ -105,38 +105,65 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// ✅ Google Login
+// // ✅ Google Login
+// export const googleLogin = async (req, res) => {
+//   try {
+//     const { idToken } = req.body;
+
+//     const ticket = await client.verifyIdToken({
+//       idToken,
+//       audience: process.env.GOOGLE_CLIENT_ID
+//     });
+
+//     const payload = ticket.getPayload();
+//     const { email, name, picture } = payload;
+
+//     let user = await User.findOne({ email });
+
+//     if (!user) {
+//       user = new User({
+//         name,
+//         email,
+//         phone: "not-set",
+//         password: "google-auth", // not used
+//         profileImage: picture,
+//         authProvider: "google"
+//       });
+//       await user.save();
+//     }
+
+//     const token = generateToken(user);
+//     res.status(200).json({ message: "Google login successful", user, token });
+
+//   } catch (err) {
+//     res.status(500).json({ message: "Google login failed", error: err.message });
+//   }
+// };
 export const googleLogin = async (req, res) => {
   try {
     const { idToken } = req.body;
-
     const ticket = await client.verifyIdToken({
       idToken,
-      audience: process.env.GOOGLE_CLIENT_ID
+      audience: "1098662333780-1oeod80vohslosm8048amqomfmiabeah.apps.googleusercontent.com",
     });
 
     const payload = ticket.getPayload();
-    const { email, name, picture } = payload;
+    const { name, email, picture } = payload;
 
     let user = await User.findOne({ email });
 
     if (!user) {
-      user = new User({
-        name,
-        email,
-        phone: "not-set",
-        password: "google-auth", // not used
-        profileImage: picture,
-        authProvider: "google"
-      });
-      await user.save();
+      user = await User.create({ name, email, picture });
     }
 
-    const token = generateToken(user);
-    res.status(200).json({ message: "Google login successful", user, token });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-  } catch (err) {
-    res.status(500).json({ message: "Google login failed", error: err.message });
+    res.status(200).json({ token, user });
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ message: "Invalid Google Token" });
   }
 };
 

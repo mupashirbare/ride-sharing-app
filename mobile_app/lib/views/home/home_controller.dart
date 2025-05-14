@@ -1,4 +1,3 @@
-// lib/controllers/home_controller.dart
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -23,6 +22,7 @@ class HomeController extends GetxController {
 
   final RxDouble estimatedFare = 0.0.obs;
   final RxDouble estimatedDistance = 0.0.obs;
+  final RxBool showSuggestions = false.obs;
 
   static const String _googleApiKey = 'YOUR_GOOGLE_API_KEY'; // Replace this
 
@@ -58,32 +58,39 @@ class HomeController extends GetxController {
     }
   }
 
-  void updateDestination(String value) async {
-    if (value.isEmpty) return;
+  void pickCurrentLocationAsDestination() {
+    if (pickupPosition.value != null) {
+      updateDestinationFromLatLng(pickupPosition.value!);
+    }
+  }
 
+  void updateDestination(String value) async {
     try {
       List<String> parts = value.split(',');
       double lat = double.parse(parts[0].trim());
       double lng = double.parse(parts[1].trim());
-
-      destinationPosition.value = LatLng(lat, lng);
-      destinationAddress.value = "Destination Selected";
-
-      markers.add(
-        Marker(
-          markerId: const MarkerId('destination'),
-          position: destinationPosition.value!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        ),
-      );
-
-      await getRoute();
+      updateDestinationFromLatLng(LatLng(lat, lng));
     } catch (e) {
       Get.snackbar(
         'Error',
         'Please enter coordinates like: latitude,longitude',
       );
     }
+  }
+
+  void updateDestinationFromLatLng(LatLng latLng) async {
+    destinationPosition.value = latLng;
+    destinationAddress.value = "Destination Selected";
+
+    markers.add(
+      Marker(
+        markerId: const MarkerId('destination'),
+        position: latLng,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ),
+    );
+
+    await getRoute();
   }
 
   Future<void> getRoute() async {
@@ -108,9 +115,7 @@ class HomeController extends GetxController {
 
     if (result.points.isNotEmpty) {
       List<LatLng> polylineCoordinates =
-          result.points
-              .map((point) => LatLng(point.latitude, point.longitude))
-              .toList();
+          result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
 
       polylines.clear();
       polylines.add(
@@ -147,7 +152,7 @@ class HomeController extends GetxController {
     double lat2,
     double lon2,
   ) {
-    const double p = 0.017453292519943295; // Math.PI / 180
+    const double p = 0.017453292519943295;
     final double a =
         0.5 -
         math.cos((lat2 - lat1) * p) / 2 +
@@ -155,6 +160,6 @@ class HomeController extends GetxController {
             math.cos(lat2 * p) *
             (1 - math.cos((lon2 - lon1) * p)) /
             2;
-    return 12742 * math.asin(math.sqrt(a)); // Distance in KM
+    return 12742 * math.asin(math.sqrt(a));
   }
 }
