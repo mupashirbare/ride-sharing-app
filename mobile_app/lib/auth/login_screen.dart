@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:country_picker/country_picker.dart';
-import '../../../controllers/auth_controller.dart';
+import '../controllers/auth_controller.dart';
 import '../views/home/widgets/custom_button.dart';
 import '../views/widgets/top_circles.dart';
 

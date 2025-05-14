@@ -26,7 +26,7 @@ const driverProfileSchema = new mongoose.Schema({
   },
   licenseImage: {
     type: String,
-    required: true
+    // required: true
   }
 });
 
