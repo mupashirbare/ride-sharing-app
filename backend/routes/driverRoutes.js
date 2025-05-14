@@ -20,6 +20,7 @@ router.post(
   upload.fields([
     { name: "licenseImage", maxCount: 1 } // ✅ Only this is needed
   ]),
+  protect,
   registerDriver
 );
 

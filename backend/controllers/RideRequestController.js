@@ -143,7 +143,7 @@ export const acceptRide = async (req, res) => {
 
     const { requestId } = req.body;
 
-    const ride = await RequestRide.findById(requestId);
+    const ride = await RideRequest.findById(requestId);
 
     if (!ride) {
       return res.status(404).json({ message: "Ride request not found" });
