@@ -11,7 +11,6 @@ class HomeController extends GetxController {
 
   final Rx<LatLng?> pickupPosition = Rx<LatLng?>(null);
   final Rx<LatLng?> destinationPosition = Rx<LatLng?>(null);
-
   final RxString pickupAddress = ''.obs;
   final RxString destinationAddress = ''.obs;
 
@@ -19,13 +18,11 @@ class HomeController extends GetxController {
   final RxSet<Polyline> polylines = <Polyline>{}.obs;
 
   final TextEditingController destinationController = TextEditingController();
-
   final RxDouble estimatedFare = 0.0.obs;
   final RxDouble estimatedDistance = 0.0.obs;
-
   final RxInt currentTabIndex = 0.obs;
 
-  final String _apiKey =
+  final String openRouteApiKey =
       '5b3ce3597851110001cf6248df54332d06dd4da58c4ec72a71d2367c';
 
   @override
@@ -36,14 +33,15 @@ class HomeController extends GetxController {
 
   Future<void> getCurrentLocation() async {
     try {
-      final position = await Geolocator.getCurrentPosition();
-      pickupPosition.value = LatLng(position.latitude, position.longitude);
-      pickupAddress.value = "You are here";
+      Position position = await Geolocator.getCurrentPosition();
+      LatLng currentLatLng = LatLng(position.latitude, position.longitude);
+      pickupPosition.value = currentLatLng;
+      getAddressFromLatLng(currentLatLng);
 
       markers.add(
         Marker(
           markerId: const MarkerId('pickup'),
-          position: pickupPosition.value!,
+          position: currentLatLng,
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueGreen,
           ),
@@ -51,23 +49,43 @@ class HomeController extends GetxController {
       );
 
       mapController?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: pickupPosition.value!, zoom: 15),
-        ),
+        CameraUpdate.newLatLngZoom(currentLatLng, 15),
       );
     } catch (e) {
-      print('Error: $e');
+      Get.snackbar('Location Error', 'Failed to get your location');
     }
   }
 
-  void setDestinationFromPlace(String label, LatLng location) {
-    destinationPosition.value = location;
+  void getAddressFromLatLng(LatLng position) async {
+    try {
+      final url = Uri.parse(
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.latitude}&lon=${position.longitude}',
+      );
+      final response = await http.get(
+        url,
+        headers: {'User-Agent': 'safarx-app/1.0'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        pickupAddress.value = data['display_name'] ?? 'You are here';
+      } else {
+        pickupAddress.value = 'You are here';
+      }
+    } catch (_) {
+      pickupAddress.value = 'You are here';
+    }
+  }
+
+  void setDestinationFromPlace(String label, LatLng position) {
+    destinationPosition.value = position;
     destinationAddress.value = label;
+    destinationController.text = label;
 
     markers.add(
       Marker(
         markerId: const MarkerId('destination'),
-        position: location,
+        position: position,
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       ),
     );
@@ -83,9 +101,10 @@ class HomeController extends GetxController {
       'https://api.openrouteservice.org/v2/directions/driving-car',
     );
     final headers = {
-      'Authorization': _apiKey,
+      'Authorization': openRouteApiKey,
       'Content-Type': 'application/json',
     };
+
     final body = jsonEncode({
       'coordinates': [
         [pickupPosition.value!.longitude, pickupPosition.value!.latitude],
@@ -96,37 +115,30 @@ class HomeController extends GetxController {
       ],
     });
 
-    try {
-      final response = await http.post(url, headers: headers, body: body);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final coords = data['features'][0]['geometry']['coordinates'] as List;
-        final points = coords.map((c) => LatLng(c[1], c[0])).toList();
+    final response = await http.post(url, headers: headers, body: body);
 
-        polylines.clear();
-        polylines.add(
-          Polyline(
-            polylineId: const PolylineId('route'),
-            points: points,
-            color: Colors.green,
-            width: 5,
-          ),
-        );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final geometry = data['features'][0]['geometry']['coordinates'] as List;
+      final polylineCoords = geometry.map((c) => LatLng(c[1], c[0])).toList();
 
-        final distMeters =
-            data['features'][0]['properties']['summary']['distance'];
-        final distanceKm = (distMeters as num) / 1000.0;
-        estimatedDistance.value = distanceKm;
-        estimatedFare.value = 2 + (distanceKm * 0.5);
-      } else {
-        Get.snackbar(
-          'Error',
-          'Could not fetch route. Check OpenRouteService key or locations.',
-        );
-      }
-    } catch (e) {
-      print('Route Error: $e');
-      Get.snackbar('Error', 'Failed to fetch route');
+      polylines.clear();
+      polylines.add(
+        Polyline(
+          polylineId: const PolylineId('route'),
+          color: Colors.green,
+          width: 5,
+          points: polylineCoords,
+        ),
+      );
+
+      final distanceMeters =
+          data['features'][0]['properties']['summary']['distance'];
+      final distanceKm = (distanceMeters as num) / 1000.0;
+      estimatedDistance.value = distanceKm.toDouble();
+      estimatedFare.value = 2 + (distanceKm * 0.5);
+    } else {
+      Get.snackbar('Route Error', 'Unable to generate route.');
     }
   }
 
@@ -135,6 +147,6 @@ class HomeController extends GetxController {
   }
 
   void sendPickupRequest() {
-    Get.snackbar("Ride Requested", "Searching for drivers...");
+    Get.snackbar("Ride Requested", "Looking for nearby drivers...");
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'welcome_screen.dart';
+import 'package:mobile_app/views/onboarding/welcome_screen.dart';
+import '../../routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -27,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
-      Get.off(() => const WelcomeScreen());
+      Get.offNamed('/welcome');
     });
   }
 
@@ -49,9 +50,8 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // White circular container with bigger logo
                 Container(
-                  width: 320, // increased size
+                  width: 320,
                   height: 330,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -75,9 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 const Text(
                   "SAFARX",
                   style: TextStyle(
@@ -87,9 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
                     letterSpacing: 1.5,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 const CircularProgressIndicator(
                   color: Colors.white,
                   strokeWidth: 2,
