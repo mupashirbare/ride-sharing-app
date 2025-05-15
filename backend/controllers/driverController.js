@@ -5,36 +5,48 @@ import User from "../models/User.js";
 // ✅ Register Driver Profile (user becomes a driver here)
 export const registerDriver = async (req, res) => {
   try {
-    const { userId, vehicleType, vehicleModel, plateNumber } = req.body;
+    const {vehicleType, vehicleModel, plateNumber } = req.body;
+    // console.log(userId)
+    console.log("User:", req.user);
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
+    const currentUser=req.user;
+    // console.log(currentUser)
+
+    if (!mongoose.Types.ObjectId.isValid(currentUser._id)) {
       return res.status(400).json({ message: "Invalid userId format" });
     }
 
-    const files = req.files;
-    const licenseImagePath = files?.licenseImage
-      ? `/uploads/${files.licenseImage[0].filename}`
-      : null;
+    // const files = req.files;
+    // const licenseImagePath = files?.licenseImage
+    //   ? `/uploads/${files.licenseImage[0].filename}`
+    //   : null;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(currentUser._id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const existingProfile = await DriverProfile.findOne({ userId });
+    if (user.userType === 'driver') {
+      return res.status(400).json({ message: 'User is already a driver' });
+    }
+
+    const existingProfile = await DriverProfile.findOne({ userId: user._id });
     if (existingProfile) {
       return res.status(400).json({ message: "Driver profile already exists" });
     }
 
     const driverProfile = new DriverProfile({
-      userId,
+      userId: user._id,
       vehicleType,
       vehicleModel,
       plateNumber,
-      licenseImage: licenseImagePath
+      // licenseImage: licenseImagePath
     });
 
     await driverProfile.save();
+
+    user.userType = 'driver';
+    await user.save();
 
     const populatedProfile = await driverProfile.populate("userId", "name email phone");
 

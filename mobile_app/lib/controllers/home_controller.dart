@@ -94,8 +94,9 @@ class HomeController extends GetxController {
   }
 
   Future<void> getRoute() async {
-    if (pickupPosition.value == null || destinationPosition.value == null)
+    if (pickupPosition.value == null || destinationPosition.value == null) {
       return;
+    }
 
     final url = Uri.parse(
       'https://api.openrouteservice.org/v2/directions/driving-car',

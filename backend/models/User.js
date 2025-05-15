@@ -24,9 +24,10 @@ const userSchema = new mongoose.Schema({
     type: String, // URL to the profile picture
     default: "https://example.com/default-profile.png"
   },
-  isAdmin: {
-    type: Boolean,
-    default: false // ✅ becomes true only if promoted manually
+  userType: {
+    type: String,
+    enum:["passenger","driver","admin"],
+    default: "passenger" // ✅ becomes true only if promoted manually
   },
   authProvider: {
     type: String,
