@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SafarX',
-      initialRoute: AppRoutes.home,
+      initialRoute: AppRoutes.login,
       getPages: AppRoutes.routes,
       defaultTransition: Transition.fadeIn,
       theme: ThemeData(

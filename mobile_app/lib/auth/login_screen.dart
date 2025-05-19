@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:country_picker/country_picker.dart';
 import '../controllers/auth_controller.dart';
+import 'package:mobile_app/routes/app_routes.dart';
 import '../views/home/widgets/custom_button.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -120,6 +121,30 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
 
+                  const SizedBox(height: 34),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (authController.phoneNumber.value.isNotEmpty) {
+                        Get.toNamed(AppRoutes.otpverify); // Go to next screen
+                      } else {
+                        Get.snackbar(
+                          "Invalid",
+                          "Please enter your phone number",
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0C8A4B),
+                      minimumSize: const Size.fromHeight(50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text(
+                      "Continue",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                   const SizedBox(height: 34),
 
                   // Divider with OR

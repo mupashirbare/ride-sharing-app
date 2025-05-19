@@ -42,7 +42,9 @@ export const registerUser = async (req, res) => {
       password,
       profileImage: profileImagePath,
     // ✅ Secure version:
-    isAdmin: req.user?.isAdmin ? (isAdmin === 'true' || isAdmin === true) : false,
+    // isAdmin: req.user?.isAdmin ? (isAdmin === 'true' || isAdmin === true) : false,
+      // Allow setting admin freely (⚠️ Only for development or manual admin creation)
+      isAdmin: isAdmin === 'true' || isAdmin === true,
       authProvider: "local"
     });
 
@@ -148,12 +150,12 @@ export const googleLogin = async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-    const { name, email, picture } = payload;
+    const { name, email,password, picture } = payload;
 
     let user = await User.findOne({ email });
 
     if (!user) {
-      user = await User.create({ name, email, picture });
+      user = await User.create({ name, email,password, picture });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
