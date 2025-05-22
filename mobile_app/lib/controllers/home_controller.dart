@@ -18,6 +18,9 @@ class HomeController extends GetxController {
   final RxSet<Polyline> polylines = <Polyline>{}.obs;
 
   final TextEditingController destinationController = TextEditingController();
+  final RxList<Map<String, dynamic>> searchResults =
+      <Map<String, dynamic>>[].obs;
+
   final RxDouble estimatedFare = 0.0.obs;
   final RxDouble estimatedDistance = 0.0.obs;
   final RxInt currentTabIndex = 0.obs;
@@ -77,10 +80,33 @@ class HomeController extends GetxController {
     }
   }
 
+  Future<void> searchPlace(String query) async {
+    final url = Uri.parse(
+      'https://nominatim.openstreetmap.org/search?q=$query&format=json&limit=5',
+    );
+    final response = await http.get(
+      url,
+      headers: {'User-Agent': 'safarx-app/1.0'},
+    );
+
+    if (response.statusCode == 200) {
+      final List results = json.decode(response.body);
+      searchResults.value =
+          results.map((item) {
+            return {
+              'label': item['display_name'],
+              'lat': double.parse(item['lat']),
+              'lon': double.parse(item['lon']),
+            };
+          }).toList();
+    }
+  }
+
   void setDestinationFromPlace(String label, LatLng position) {
     destinationPosition.value = position;
     destinationAddress.value = label;
     destinationController.text = label;
+    searchResults.clear();
 
     markers.add(
       Marker(
@@ -94,9 +120,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> getRoute() async {
-    if (pickupPosition.value == null || destinationPosition.value == null) {
+    if (pickupPosition.value == null || destinationPosition.value == null)
       return;
-    }
 
     final url = Uri.parse(
       'https://api.openrouteservice.org/v2/directions/driving-car',
