@@ -3,7 +3,9 @@ import 'dart:convert'; // ✅ required for jsonEncode and jsonDecode
 import 'package:get/get.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mobile_app/routes/app_routes.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import '../constant.dart';
 import 'package:get_storage/get_storage.dart'; // if using local storage
 
 class AuthController extends GetxController {
@@ -27,43 +29,54 @@ class AuthController extends GetxController {
     phoneNumber.value = value;
   }
 
-  Future<void> signInWithGoogle() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(
-      serverClientId:
-          '1098662333780-1oeod80vohslosm8048amqomfmiabeah.apps.googleusercontent.com',
+ Future<void> signInWithGoogle() async {
+  final GoogleSignIn googleSignIn = GoogleSignIn(
+    serverClientId: kGoogleClientId,
+  );
+
+  try {
+    final result = await googleSignIn.signIn();
+    if (result == null) {
+      Get.snackbar("Cancelled", "Google Sign-In was cancelled.");
+      return;
+    }
+
+    final googleAuth = await result.authentication;
+    final idToken = googleAuth.idToken;
+
+    if (idToken == null) {
+      Get.snackbar("Error", "Google ID Token is null.");
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse("http://10.0.2.2:5000/api/auth/google-login"),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'idToken': idToken}),
     );
 
-    try {
-      final result = await googleSignIn.signIn();
-      if (result != null) {
-        final googleAuth = await result.authentication;
-        final idToken = googleAuth.idToken;
+    print('Backend Response: ${response.statusCode} ${response.body}');
 
-        if (idToken == null) {
-          Get.snackbar("Error", "Google ID Token is null.");
-          return;
-        }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final box = GetStorage();
+      box.write('token', data['token']);
+      box.write('user', data['user']);
 
-        final response = await http.post(
-          Uri.parse("http://10.0.2.2:5000/api/auth/google-login"),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'idToken': idToken}),
-        );
-
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final box = GetStorage();
-          box.write('token', data['token']);
-          box.write('user', data['user']);
-          Get.snackbar("Welcome", "Hi ${data['user']['name']}");
-        } else {
-          Get.snackbar("Login Failed", "Server error: ${response.statusCode}");
-        }
-      }
-    } catch (e) {
-      Get.snackbar("Google Sign-In Error", e.toString());
+      Get.snackbar("Welcome", "Hi ${data['user']['name']}");
+      Get.offAllNamed(AppRoutes.home);
+    } else {
+      Get.snackbar("Login Failed", "Server error: ${response.statusCode}");
     }
+  } catch (e) {
+    if (e.toString().contains('SocketException')) {
+      Get.snackbar("Server Unreachable", "Backend server is not running.");
+    } else {
+      Get.snackbar("Error", e.toString());
+    }
+    print("Google Sign-In Error: $e");
   }
+}
 
   void signInWithFacebook() async {
     try {

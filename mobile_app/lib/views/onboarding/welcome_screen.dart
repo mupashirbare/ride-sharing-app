@@ -54,7 +54,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   void _navigateToHome() {
     // ✅ Go directly to home screen, skip login
-    Get.offAllNamed(AppRoutes.home);
+    Get.offAllNamed(AppRoutes.login);
   }
 
   @override

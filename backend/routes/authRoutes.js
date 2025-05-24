@@ -4,18 +4,19 @@ import isAdmin from "../middleware/adminMiddleware.js";
 import protect from "../middleware/authMiddleware.js"; 
 import {
   registerUser,
-  verifyPhone,
   loginUser,
   googleLogin,
   logoutUser, 
-
+  sendOtp,
+  verifyOtp,
 } from "../controllers/userController.js";
 
 const router = express.Router();
 
 // ✅ Public registration & login
 router.post("/register", upload.single("profileImage"), registerUser);
-router.post("/verify-phone", verifyPhone);
+router.post("/send-otp", sendOtp);
+router.post("/verify-otp", verifyOtp);
 router.post("/login", loginUser);
 
 // ✅ OAuth

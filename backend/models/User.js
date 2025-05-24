@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema({
     enum: ["local", "google"],
     default: "local"
   },
+  otp: {
+  type: String
+},
+otpExpires: {
+  type: Date
+},
   createdAt: {
     type: Date,
     default: Date.now
