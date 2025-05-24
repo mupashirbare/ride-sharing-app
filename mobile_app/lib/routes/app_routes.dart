@@ -30,10 +30,12 @@ abstract class AppRoutes {
       transition: Transition.fadeIn,
     ),
     GetPage(
-    name: otpverify, // ✅ Add this
-    page: () => OtpVerificationScreen(phoneNumber: '+252612000000'), // temp number
-    transition: Transition.fadeIn,
+  name: otpverify,
+  page: () => OtpVerificationScreen(
+    phoneNumber: Get.arguments['phone'],
   ),
+  transition: Transition.fadeIn,
+),
     GetPage(
       name: home,
       page: () => const HomeScreen(),
