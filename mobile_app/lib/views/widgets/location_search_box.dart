@@ -88,7 +88,7 @@ class _LocationSearchBoxState extends State<LocationSearchBox> {
               });
             },
           );
-        }).toList(),
+        }),
       ],
     );
   }
