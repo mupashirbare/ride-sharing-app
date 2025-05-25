@@ -11,6 +11,8 @@ import 'package:mobile_app/driver/starting_trip.dart';
 import 'package:mobile_app/views/onboarding/splash_screen.dart';
 import 'package:mobile_app/views/onboarding/welcome_screen.dart';
 import 'package:mobile_app/views/home/home_screen.dart';
+import 'package:mobile_app/auth/login_screen.dart';
+import 'package:mobile_app/auth/otp_verification_screen.dart';
 import '../bindings/home_binding.dart';
 
 abstract class AppRoutes {
@@ -39,16 +41,28 @@ abstract class AppRoutes {
       page: () => const WelcomeScreen(),
       transition: Transition.fadeIn,
     ),
-    // GetPage(
-    //   name: login,
-    //   page: () => const LoginScreen(),
-    //   transition: Transition.fadeIn,
-    // ),
+    GetPage(
+      name: login,
+      page: () => LoginScreen(),
+      transition: Transition.fadeIn,
+    ),
     // GetPage(
     //   name: otpverify,
     //   page: () => const (),
     //   transition: Transition.fadeIn,
     // ),
+    GetPage(
+      name: login,
+      page: () => LoginScreen(), // ✅ Register login page
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+  name: otpverify,
+  page: () => OtpVerificationScreen(
+    phoneNumber: Get.arguments['phone'],
+  ),
+  transition: Transition.fadeIn,
+),
     GetPage(
       name: home,
       page: () => const HomeScreen(),

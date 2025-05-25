@@ -1,7 +1,10 @@
 import jwt from "jsonwebtoken";
+import axios from "axios";
+import otpGenerator from "otp-generator";
 import User from "../models/User.js";
 import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
+dotenv.config();
 const client = new OAuth2Client("1098662333780-1oeod80vohslosm8048amqomfmiabeah.apps.googleusercontent.com");
 
 // ✅ Generate JWT
@@ -10,6 +13,48 @@ const generateToken = (user) => {
     expiresIn: "7d",
   });
 };
+const SMS_USER = process.env.SMS_USER;
+const SMS_PASS = process.env.SMS_PASS;
+export const sendOtp = async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ error: "Phone number is required" });
+  const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  // const otp = otpGenerator.generate(4, {
+  //   upperCase: false,
+  //   specialChars: false,
+  //   alphabets: false,
+  //    digits: true  
+  // });
+
+  await User.updateOne(
+    { phone },
+    { phone, otp, otpExpires: Date.now() + 5 * 60 * 1000 },
+    { upsert: true }
+  );
+
+  const message = `Codsigaaga SafarX OTP: ${otp}`;
+  const smsUrl = `https://tabaarakict.so/SendSMS.aspx?user=${SMS_USER}&pass=${SMS_PASS}&cont=${encodeURIComponent(message)}&rec=${phone}`;
+
+  try {
+    await axios.get(smsUrl);
+    return res.json({ success: true, sent: true, phone });
+  } catch (err) {
+    return res.status(500).json({ error: "SMS sending failed", details: err.message });
+  }
+};
+
+export const verifyOtp = async (req, res) => {
+  const { phone, otp } = req.body;
+  const user = await User.findOne({ phone });
+  if (!user || user.otp !== otp || Date.now() > user.otpExpires)
+    return res.status(400).json({ error: "OTP invalid or expired" });
+
+  user.otp = null; user.otpExpires = null; await user.save();
+
+  const token = generateToken(user);
+  res.json({ verified: true, token, user });
+};
+
 // ✅ Register user via email & password with profile image
 export const registerUser = async (req, res) => {
   try {
@@ -42,7 +87,9 @@ export const registerUser = async (req, res) => {
       password,
       profileImage: profileImagePath,
     // ✅ Secure version:
-    isAdmin: req.user?.isAdmin ? (isAdmin === 'true' || isAdmin === true) : false,
+    // isAdmin: req.user?.isAdmin ? (isAdmin === 'true' || isAdmin === true) : false,
+      // Allow setting admin freely (⚠️ Only for development or manual admin creation)
+      isAdmin: isAdmin === 'true' || isAdmin === true,
       authProvider: "local"
     });
 
@@ -50,33 +97,6 @@ export const registerUser = async (req, res) => {
 
     const token = generateToken(newUser);
     res.status(201).json({ message: "User registered", user: newUser, token });
-
-  } catch (err) {
-    res.status(500).json({ message: "Server Error", error: err.message });
-  }
-};
-
-
-
-// ✅ Phone Login (create user if not exists)
-export const verifyPhone = async (req, res) => {
-  try {
-    const phone = req.body.phone?.trim();
-    if (!phone) return res.status(400).json({ message: "Phone number is required" });
-
-    let user = await User.findOne({ phone });
-
-    if (!user) {
-      user = new User({
-        phone,
-        name: "New User",
-        authProvider: "local"
-      });
-      await user.save();
-    }
-
-    const token = generateToken(user);
-    res.status(200).json({ message: "User authenticated", user, token });
 
   } catch (err) {
     res.status(500).json({ message: "Server Error", error: err.message });
@@ -109,42 +129,41 @@ export const loginUser = async (req, res) => {
 // export const googleLogin = async (req, res) => {
 //   try {
 //     const { idToken } = req.body;
-
 //     const ticket = await client.verifyIdToken({
 //       idToken,
-//       audience: process.env.GOOGLE_CLIENT_ID
+//       audience: process.env.GOOGLE_CLIENT_ID,
 //     });
 
 //     const payload = ticket.getPayload();
-//     const { email, name, picture } = payload;
+//     const { name, email,password, picture } = payload;
 
 //     let user = await User.findOne({ email });
 
 //     if (!user) {
-//       user = new User({
-//         name,
-//         email,
-//         phone: "not-set",
-//         password: "google-auth", // not used
-//         profileImage: picture,
-//         authProvider: "google"
-//       });
-//       await user.save();
+//       user = await User.create({
+//          name,
+//           email,
+//           password,
+//           profileImage: picture });
 //     }
 
-//     const token = generateToken(user);
-//     res.status(200).json({ message: "Google login successful", user, token });
+//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: "7d",
+//     });
 
-//   } catch (err) {
-//     res.status(500).json({ message: "Google login failed", error: err.message });
+//     res.status(200).json({ token, user });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(401).json({ message: "Invalid Google Token" });
 //   }
 // };
 export const googleLogin = async (req, res) => {
   try {
     const { idToken } = req.body;
+
     const ticket = await client.verifyIdToken({
       idToken,
-      audience: "1098662333780-1oeod80vohslosm8048amqomfmiabeah.apps.googleusercontent.com",
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -153,19 +172,23 @@ export const googleLogin = async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      user = await User.create({ name, email, picture });
+      user = await User.create({
+        name,
+        email,
+        profileImage: picture,
+        authProvider: "google"
+      });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
+    const token = generateToken(user); // use your helper function
     res.status(200).json({ token, user });
+
   } catch (error) {
     console.error(error);
     res.status(401).json({ message: "Invalid Google Token" });
   }
 };
+
 
 // ✅ Update user profile
 export const updateUser = async (req, res) => {
