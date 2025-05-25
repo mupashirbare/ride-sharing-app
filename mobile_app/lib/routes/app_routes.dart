@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:get/get.dart';
+import 'package:mobile_app/auth/login_screen.dart';
 import 'package:mobile_app/driver/arriving.dart';
 import 'package:mobile_app/driver/end_trip.dart';
 import 'package:mobile_app/driver/fare_collection.dart';
@@ -38,6 +41,16 @@ abstract class AppRoutes {
       page: () => const WelcomeScreen(),
       transition: Transition.fadeIn,
     ),
+    GetPage(
+      name: login,
+      page: () => LoginScreen(),
+      transition: Transition.fadeIn,
+    ),
+    // GetPage(
+    //   name: otpverify,
+    //   page: () => const (),
+    //   transition: Transition.fadeIn,
+    // ),
     GetPage(
       name: login,
       page: () => LoginScreen(), // ✅ Register login page

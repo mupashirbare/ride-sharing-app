@@ -5,9 +5,90 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9758df61-e824-4be4-950d-8e03c1b54c80" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/mobile_app/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/android/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile_app/android/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/android/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/eslint.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/postcss.config.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/17.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/Carpool-amico.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/Carpool-rafiki.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/Gemini_Generated_Image_bgnjgvbgnjgvbgnj.jpeg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/Gemini_Generated_Image_yuf063yuf063yuf0.jpeg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/approved.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/awerd.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/car-access-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/car-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/check-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/documents-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/earnings-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/footermaps.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/hefow.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/hero.jpeg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/mupashir.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/safarxlogo.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/service1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/service2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/service3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/shukri.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/steering-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/support-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/upload-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/user-green.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/verified.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/public/vite.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/App.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/assets/react.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/components/Footer.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/components/Navbar.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/components/Notifications.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/components/Services.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/index.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/layout/ModernAdminDashboard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/main.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/About.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/DashboardOverview.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Documents.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/DriverLogin.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/DriverProfile.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Drivers.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Home.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Login.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/OTTPModal.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Profile.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Register.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Reports.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Rides.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/Support.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/src/pages/UserManagement.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/tailwind.config.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SafarX-Website/vite.config.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/uploads/profile-1746964565313.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/uploads/profile-1746964615321.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile_app/lib/auth/otp_verification_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile_app/lib/constant.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/ride-sharing-app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ride-sharing-app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/controllers/userController.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/userController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/models/User.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/User.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routes/authRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/authRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_app/lib/auth/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/lib/auth/login_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mobile_app/lib/controllers/auth_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/lib/controllers/auth_controller.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_app/lib/controllers/home_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/lib/controllers/home_controller.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_app/lib/routes/app_routes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/lib/routes/app_routes.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_app/lib/views/home/home_controller.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_app/lib/views/home/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/lib/views/home/home_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_app/lib/views/onboarding/welcome_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/lib/views/onboarding/welcome_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_app/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_app/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_app/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,9 +101,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2wtohg3FOy4m3muVsKjWaiSDp2H" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -30,13 +111,15 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Merging hefow",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/ride-sharing-app",
     "settings.editor.selected.configurable": "AndroidSdkUpdater",
