@@ -13,6 +13,7 @@ import 'package:mobile_app/views/onboarding/welcome_screen.dart';
 import 'package:mobile_app/views/home/home_screen.dart';
 import 'package:mobile_app/auth/login_screen.dart';
 import 'package:mobile_app/auth/otp_verification_screen.dart';
+import 'package:mobile_app/auth/register.dart';
 import '../bindings/home_binding.dart';
 
 abstract class AppRoutes {
@@ -20,6 +21,7 @@ abstract class AppRoutes {
   static const String welcome = '/welcome';
   static const String login = '/login';
   static const String otpverify = '/verifyPhone';
+  static const String register = '/register';
   static const String home = '/home';
   static const String driverHome = '/driverHome';
   static const String requestDetail ="/request_detail";
@@ -60,6 +62,12 @@ abstract class AppRoutes {
   name: otpverify,
   page: () => OtpVerificationScreen(
     phoneNumber: Get.arguments['phone'],
+  ),
+  transition: Transition.fadeIn,
+),
+  GetPage(
+  name: register,
+  page: () =>Register(
   ),
   transition: Transition.fadeIn,
 ),

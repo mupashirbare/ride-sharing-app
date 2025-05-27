@@ -19,12 +19,6 @@ export const sendOtp = async (req, res) => {
   const { phone } = req.body;
   if (!phone) return res.status(400).json({ error: "Phone number is required" });
   const otp = Math.floor(1000 + Math.random() * 9000).toString();
-  // const otp = otpGenerator.generate(4, {
-  //   upperCase: false,
-  //   specialChars: false,
-  //   alphabets: false,
-  //    digits: true  
-  // });
 
   await User.updateOne(
     { phone },
@@ -56,48 +50,70 @@ export const verifyOtp = async (req, res) => {
 };
 
 // ✅ Register user via email & password with profile image
+// export const registerUser = async (req, res) => {
+//   try {
+//     const { name, email, phone, password, isAdmin } = req.body;
+
+//     if (!email || !password || !phone) {
+//       return res.status(400).json({ message: "All fields are required" });
+//     }
+
+//     // Check if user already exists
+//     const existing = await User.findOne({ $or: [{ email }, { phone }] });
+//     if (existing) {
+//       return res.status(400).json({ message: "User already exists" });
+//     }
+
+//     // ✅ Handle profile image upload
+//     const profileImagePath = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+//     // ✅ Only allow admin creation if current user is an admin
+//     let allowAdmin = false;
+
+//     if (req.user && req.user.isAdmin) {
+//       allowAdmin = true;
+//     }
+
+//     const newUser = new User({
+//       name,
+//       email,
+//       phone,
+//       password,
+//       profileImage: profileImagePath,
+//     // ✅ Secure version:
+//     // isAdmin: req.user?.isAdmin ? (isAdmin === 'true' || isAdmin === true) : false,
+//       // Allow setting admin freely (⚠️ Only for development or manual admin creation)
+//       isAdmin: isAdmin === 'true' || isAdmin === true,
+//       authProvider: "local"
+//     });
+
+//     await newUser.save();
+
+//     const token = generateToken(newUser);
+//     res.status(201).json({ message: "User registered", user: newUser, token });
+
+//   } catch (err) {
+//     res.status(500).json({ message: "Server Error", error: err.message });
+//   }
+// };
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, phone, password, isAdmin } = req.body;
-
-    if (!email || !password || !phone) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Check if user already exists
-    const existing = await User.findOne({ $or: [{ email }, { phone }] });
-    if (existing) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    // ✅ Handle profile image upload
+    const userId = req.user._id;
+    const { name, email, profileImage } = req.body;
+    // ✅ Handle optional profile image upload
     const profileImagePath = req.file ? `/uploads/${req.file.filename}` : undefined;
 
-    // ✅ Only allow admin creation if current user is an admin
-    let allowAdmin = false;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (req.user && req.user.isAdmin) {
-      allowAdmin = true;
-    }
+    // Only update provided fields
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (profileImage) user.profileImage = profileImage;
 
-    const newUser = new User({
-      name,
-      email,
-      phone,
-      password,
-      profileImage: profileImagePath,
-    // ✅ Secure version:
-    // isAdmin: req.user?.isAdmin ? (isAdmin === 'true' || isAdmin === true) : false,
-      // Allow setting admin freely (⚠️ Only for development or manual admin creation)
-      isAdmin: isAdmin === 'true' || isAdmin === true,
-      authProvider: "local"
-    });
+    await user.save();
 
-    await newUser.save();
-
-    const token = generateToken(newUser);
-    res.status(201).json({ message: "User registered", user: newUser, token });
-
+    res.status(200).json({ message: "User updated", user });
   } catch (err) {
     res.status(500).json({ message: "Server Error", error: err.message });
   }

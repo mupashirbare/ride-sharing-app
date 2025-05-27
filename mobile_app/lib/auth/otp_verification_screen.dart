@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../routes/app_routes.dart';
+import 'package:get_storage/get_storage.dart';
 
 class OtpVerificationScreen extends StatelessWidget {
   final String phoneNumber;
@@ -13,24 +14,37 @@ class OtpVerificationScreen extends StatelessWidget {
 
   // ✅ Function to verify OTP with backend
   Future<void> verifyOtp(String phone, String otp) async {
-    final url = Uri.parse("http://10.0.2.2:5000/api/auth/verify-otp"); // 🔁 Replace with your IP or domain
+    final url = Uri.parse("http://10.0.2.2:5000/api/auth/verify-otp");
 
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "phone": phone,
-          "otp": otp,
-        }),
+        body: jsonEncode({"phone": phone, "otp": otp}),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data['token'];
+        final user = data['user'];
 
-        // ✅ Store token if needed here (e.g. with GetStorage)
-        Get.offAllNamed(AppRoutes.home);
+        // ✅ If name is missing → go to register screen
+        if (user['name'] == null || user['name'].toString().isEmpty) {
+          Get.offAllNamed(AppRoutes.register, arguments: {"token": token});
+          return;
+        }
+
+        // ✅ Else, save token + user
+        final storage = GetStorage();
+        storage.write("token", token);
+        storage.write("user", user);
+
+        // ✅ Navigate based on user type
+        if (user['isDriver'] == true || user['userType'] == 'driver') {
+          Get.offAllNamed(AppRoutes.driverHome);
+        } else {
+          Get.offAllNamed(AppRoutes.home);
+        }
       } else {
         final error = jsonDecode(response.body);
         Get.snackbar("Verification Failed", error["error"] ?? "Invalid OTP");
@@ -58,10 +72,7 @@ class OtpVerificationScreen extends StatelessWidget {
               const SizedBox(height: 16),
               const Text(
                 "Enter the code",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Text(

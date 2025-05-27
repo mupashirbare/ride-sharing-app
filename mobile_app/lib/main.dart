@@ -6,8 +6,10 @@ import 'package:get_storage/get_storage.dart'; // ✅ Import GetStorage
 import 'routes/app_routes.dart';
 import 'services/location_service.dart';
 import 'controllers/home_controller.dart';
+import 'auth/login_screen.dart';
 
 void main() async {
+   await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
 
   // ✅ Init local storage
@@ -40,7 +42,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SafarX',
-      initialRoute: AppRoutes.home,
+      initialRoute: AppRoutes.login,
       getPages: AppRoutes.routes,
       defaultTransition: Transition.fadeIn,
       theme: ThemeData(
