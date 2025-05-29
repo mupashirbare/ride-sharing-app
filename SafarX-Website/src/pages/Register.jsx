@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -30,8 +33,9 @@ const Register = () => {
     }
 
     console.log('Form data ready:', form);
-    // Placeholder for navigation or next step
-    alert('Form submitted (no backend connected)');
+    
+    // Navigate to DriverProfile page after successful validation
+    navigate('/driver_profile');
   };
 
   return (

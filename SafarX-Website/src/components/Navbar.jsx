@@ -33,13 +33,13 @@ const Navbar = () => {
             <Link to="/" className="hover:text-green-600 dark:hover:text-green-400 transition">Home</Link>
             <Link to="/support" className="hover:text-green-600 dark:hover:text-green-400 transition">Support</Link>
             <Link to="/about" className="hover:text-green-600 dark:hover:text-green-400 transition">About</Link>
-            <Link to="/driver_profile" className="hover:text-green-600 dark:hover:text-green-400 transition">Driver</Link>
+            <Link to="/driver-info" className="hover:text-green-600 dark:hover:text-green-400 transition">Driver</Link>
           </div>
 
           {/* Right - Auth + Dark Toggle */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login" className="hover:text-green-600 dark:hover:text-green-400 transition">Login</Link>
-            <Link to="/register" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">Register</Link>
+            <Link to="/register" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">Sign up</Link>
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="text-xl focus:outline-none"
@@ -63,11 +63,11 @@ const Navbar = () => {
         <Link to="/" className="block py-2 hover:text-green-600 dark:hover:text-green-400">Home</Link>
         <Link to="/support" className="block py-2 hover:text-green-600 dark:hover:text-green-400">Support</Link>
         <Link to="/about" className="block py-2 hover:text-green-600 dark:hover:text-green-400">About</Link>
-        <Link to="/driver" className="block py-2 hover:text-green-600 dark:hover:text-green-400">Driver</Link>
+        <Link to="/driver-info" className="block py-2 hover:text-green-600 dark:hover:text-green-400">Driver</Link>
         <hr className="my-2 border-gray-300 dark:border-gray-700" />
         <Link to="/login" className="block py-2 hover:text-green-600 dark:hover:text-green-400">Login</Link>
         <Link to="/register" className="block text-center text-white bg-green-600 px-4 py-2 rounded-md mt-2 hover:bg-green-700">
-          Register
+          Sign up
         </Link>
         <button
           onClick={() => setDarkMode(!darkMode)}

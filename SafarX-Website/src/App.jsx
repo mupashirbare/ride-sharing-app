@@ -19,6 +19,7 @@ import OTTPModal from './pages/OTTPModal';
 import 'flag-icons/css/flag-icons.min.css';
 import ModernAdminDashboard from './layout/ModernAdminDashboard';
 import Notifications from './components/Notifications';
+import DriverInfo from './pages/DriverInfo';
 function App() {
   return (
     <Router>
@@ -27,7 +28,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<DriverLogin />} />
         <Route path="/driver_profile" element={<DriverProfile />} />
-       <Route path="/driver/otp" element={<OTTPModal />} />
+        <Route path="/driver-info" element={<DriverInfo />} />
+        <Route path="/driver/otp" element={<OTTPModal />} />
         <Route path="/driver/Register" element={<Register/>} />
 
 
